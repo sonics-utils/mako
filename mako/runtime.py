@@ -832,8 +832,13 @@ def _lookup_template(context, uri, relativeto):
             "Template '%s' has no TemplateLookup associated"
             % context._with_template.uri
         )
-    uri = lookup.adjust_uri(uri, relativeto)
     try:
+        return lookup.get_template(uri)
+    except exceptions.TopLevelLookupException:
+        raise exceptions.TemplateLookupException(str(compat.exception_as()))
+    # Try with relative path
+    try:
+        uri = lookup.adjust_uri(uri, relativeto)
         return lookup.get_template(uri)
     except exceptions.TopLevelLookupException as e:
         raise exceptions.TemplateLookupException(
